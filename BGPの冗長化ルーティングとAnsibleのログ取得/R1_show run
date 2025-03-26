@@ -1,9 +1,9 @@
 R1#show run
 Building configuration...
 
-Current configuration : 2321 bytes
+Current configuration : 2349 bytes
 !
-! Last configuration change at 09:28:07 UTC Wed Mar 26 2025
+! Last configuration change at 11:06:53 UTC Wed Mar 26 2025
 version 15.3
 service timestamps debug datetime msec
 service timestamps log datetime msec
@@ -52,14 +52,11 @@ license accept end user agreement
 license boot module c800 level advipservices
 !
 !
-vtp mode transparent
 username cisco password 0 cisco
 !
 !
 !
 !
-!
-vlan 2-7,10,100,1000 
 !
 ip ssh version 2
 ! 
@@ -98,6 +95,7 @@ interface FastEthernet0
 !
 interface GigabitEthernet0
  switchport access vlan 100
+ switchport trunk allowed vlan 1,2,100,1002-1005
  no ip address
 !
 interface GigabitEthernet1
@@ -143,6 +141,7 @@ router eigrp 1002
  network 3.3.3.3 0.0.0.0
  network 4.4.4.4 0.0.0.0
  network 192.168.10.0
+ redistribute connected
 !
 ip forward-protocol nd
 no ip http server
@@ -181,4 +180,3 @@ line vty 0 4
 scheduler allocate 20000 1000
 !
 end
-
