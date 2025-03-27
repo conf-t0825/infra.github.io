@@ -1,9 +1,9 @@
 R2#show run
 Building configuration...
 
-Current configuration : 3796 bytes
+Current configuration : 3860 bytes
 !
-! Last configuration change at 06:57:58 UTC Thu Mar 27 2025
+! Last configuration change at 10:47:53 UTC Thu Mar 27 2025
 version 15.3
 service timestamps debug datetime msec
 service timestamps log datetime msec
@@ -26,6 +26,8 @@ memory-size iomem 5
 !
 !
 !
+
+
 !
 !
 !
@@ -39,7 +41,6 @@ no ipv6 cef
 !
 !
 multilink bundle-name authenticated
-!
 !
 !
 !
@@ -155,9 +156,11 @@ router eigrp 1001
 router bgp 65001
  bgp log-neighbor-changes
  neighbor 172.16.20.5 remote-as 65002
- neighbor 172.16.20.5 update-source GigabitEthernet1
+ neighbor 172.16.20.5 ebgp-multihop 255
+ neighbor 172.16.20.5 update-source Vlan1000
  neighbor 172.16.40.5 remote-as 65002
- neighbor 172.16.40.5 update-source GigabitEthernet2
+ neighbor 172.16.40.5 ebgp-multihop 255
+ neighbor 172.16.40.5 update-source Vlan3000
  !
  address-family ipv4
   redistribute eigrp 1002 route-map Pri-aspath
