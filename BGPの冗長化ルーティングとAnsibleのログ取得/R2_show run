@@ -1,9 +1,9 @@
 R2#show run
 Building configuration...
 
-Current configuration : 3860 bytes
+Current configuration : 3966 bytes
 !
-! Last configuration change at 10:47:53 UTC Thu Mar 27 2025
+! Last configuration change at 11:27:12 UTC Thu Mar 27 2025
 version 15.3
 service timestamps debug datetime msec
 service timestamps log datetime msec
@@ -41,7 +41,6 @@ no ipv6 cef
 !
 !
 multilink bundle-name authenticated
-!
 !
 !
 !
@@ -140,6 +139,8 @@ interface Async3
 router eigrp 1002
  network 192.168.10.0
  redistribute bgp 65001 metric 1000000 1 255 1 1500
+ redistribute eigrp 1000 metric 1000000 1 255 1 1500
+ redistribute eigrp 1001 metric 1000000 1 255 1 1500
 !
 !
 router eigrp 1000
