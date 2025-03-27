@@ -1,0 +1,129 @@
+R6#show run
+Building configuration...
+
+Current configuration : 1707 bytes
+!
+! Last configuration change at 12:11:31 UTC Mon Jan 2 2006
+! NVRAM config last updated at 12:11:35 UTC Mon Jan 2 2006
+! NVRAM config last updated at 12:11:35 UTC Mon Jan 2 2006
+version 15.1
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R6
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable secret 5 $1$FMar$lpYV82.B2em49i7vOJWRE0
+!
+no aaa new-model
+!
+crypto pki token default removal timeout 0
+!
+!
+dot11 syslog
+ip source-route
+!
+!
+!
+!
+!
+ip cef
+ip domain name cisco.com
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+ip ssh version 2
+! 
+!
+!
+!
+!
+!
+!
+interface BRI0
+ no ip address
+ encapsulation hdlc
+ shutdown
+!
+interface FastEthernet0
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+interface FastEthernet1
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+interface FastEthernet2
+ switchport trunk native vlan 200
+ switchport trunk allowed vlan 1,2,200,1002-1005
+ switchport mode trunk
+ no ip address
+!
+interface FastEthernet3
+ no ip address
+!
+interface FastEthernet4
+ no ip address
+!
+interface FastEthernet5
+ no ip address
+!
+interface FastEthernet6
+ no ip address
+!
+interface FastEthernet7
+ no ip address
+!
+interface FastEthernet8
+ no ip address
+!
+interface FastEthernet9
+ no ip address
+!
+interface Vlan1
+ no ip address
+!
+interface Vlan200
+ ip address 192.168.20.6 255.255.255.0
+!
+!
+router eigrp 1002
+ network 192.168.20.0
+!
+ip forward-protocol nd
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+!
+!
+!
+!
+!
+control-plane
+!
+!
+!
+line con 0
+line aux 0
+line vty 0 4
+ login local
+ transport input ssh
+!
+end
+
