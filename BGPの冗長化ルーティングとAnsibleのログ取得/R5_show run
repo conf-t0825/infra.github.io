@@ -1,9 +1,9 @@
 R5#show run
 Building configuration...
 
-Current configuration : 3282 bytes
+Current configuration : 3923 bytes
 !
-! Last configuration change at 11:16:00 UTC Thu Mar 27 2025
+! Last configuration change at 10:49:20 UTC Fri Mar 28 2025
 version 15.3
 service timestamps debug datetime msec
 service timestamps log datetime msec
@@ -25,6 +25,8 @@ no aaa new-model
 !
 !
 !
+
+
 !
 !
 !
@@ -45,6 +47,9 @@ multilink bundle-name authenticated
 !
 !
 !
+license feature MEM-8XX-512U1GB
+license udi pid C891FJ-K9 sn FGL192322DN
+license boot module c800 level advipservices
 !
 !
 vtp mode transparent
@@ -163,9 +168,14 @@ router bgp 65002
  neighbor 172.16.30.2 update-source Vlan4000
  !
  address-family ipv4
+  network 172.16.20.0 mask 255.255.255.0
+  network 172.16.40.0 mask 255.255.255.0
+  network 192.168.20.0
   redistribute eigrp 1002
   neighbor 172.16.10.2 activate
+  neighbor 172.16.10.2 route-map Pri-aspath out
   neighbor 172.16.30.2 activate
+  neighbor 172.16.30.2 route-map sec-aspath out
  exit-address-family
 !
 ip forward-protocol nd
@@ -174,6 +184,22 @@ no ip http secure-server
 !
 !
 !
+!
+ip prefix-list cisco seq 5 permit 172.16.20.0/24
+ip prefix-list cisco seq 10 permit 172.16.40.0/24
+ip prefix-list cisco seq 15 permit 192.168.20.0/24
+!
+route-map sec-aspath permit 10
+ match ip address prefix-list cisco
+ set as-path prepend 65001 65001 65001 65001
+!
+route-map sec-aspath permit 20
+!
+route-map Pri-aspath permit 10
+ match ip address prefix-list cisco
+ set as-path prepend 65001 65001 65001
+!
+route-map Pri-aspath permit 20
 !
 !
 control-plane
