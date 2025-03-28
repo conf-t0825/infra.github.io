@@ -47,10 +47,6 @@ multilink bundle-name authenticated
 !
 !
 !
-license feature MEM-8XX-512U1GB
-license udi pid C891FJ-K9 sn FGL192322DN
-license boot module c800 level advipservices
-!
 !
 vtp mode transparent
 username cisco password 0 cisco
