@@ -1,9 +1,9 @@
 R2#show run
 Building configuration...
 
-Current configuration : 3966 bytes
+Current configuration : 4145 bytes
 !
-! Last configuration change at 11:27:12 UTC Thu Mar 27 2025
+! Last configuration change at 10:36:58 UTC Fri Mar 28 2025
 version 15.3
 service timestamps debug datetime msec
 service timestamps log datetime msec
@@ -41,6 +41,7 @@ no ipv6 cef
 !
 !
 multilink bundle-name authenticated
+!
 !
 !
 !
@@ -164,6 +165,11 @@ router bgp 65001
  neighbor 172.16.40.5 update-source Vlan3000
  !
  address-family ipv4
+  network 1.1.1.1 mask 255.255.255.255
+  network 2.2.2.2 mask 255.255.255.255
+  network 3.3.3.3 mask 255.255.255.255
+  network 4.4.4.4 mask 255.255.255.255
+  network 192.168.10.0
   redistribute eigrp 1002 route-map Pri-aspath
   neighbor 172.16.20.5 activate
   neighbor 172.16.20.5 route-map Pri-aspath out
@@ -228,4 +234,3 @@ line vty 0 4
 scheduler allocate 20000 1000
 !
 end
-
