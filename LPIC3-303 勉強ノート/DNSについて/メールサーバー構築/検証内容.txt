@@ -1,3 +1,17 @@
 #DNSについて理解する為に、GNS3で構成図を元に構築してみる。
 
+＃使用機器一覧
 
+【サーバー】
+DNSサーバー(送信者用と受信者用)⇨RockeyLinux9.5(2台)
+MTAサーバー(送信者用と受信者用)⇨RockeyLinux9.5(2台)
+MDA+IMAP/POP3サーバー(送信者用と受信者用)⇨RockeyLinux9.5(2台)
+
+【ネットワーク】
+C3745(Dynamips)⇨ホスト名：R1,WAN1,R2(3台)
+スイッチ(2台)
+
+【クライアントPC】
+CentOS stream 10(送信者用、1台)
+CentOS stream 10(受信者用、1台)
+※各クライアントPCにはThunderbirdをインストールする。
