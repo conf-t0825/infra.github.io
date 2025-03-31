@@ -1,4 +1,4 @@
-eBGPのTTLはデフォルトで1です。
+eBGPパケットのTTLはデフォルトで1です。
 もしeBGPセッションを行う場合は、複数ホップ数分neighbor コマンドにて ebgp-multihop キーワードで TTL を増やす必要があります。
 例えば以下の構成の場合は、"neighbor <IPアドレス> ebgp-multihop 2"　のようにする
 BGPルーター-WANルーター-BGPルーター
