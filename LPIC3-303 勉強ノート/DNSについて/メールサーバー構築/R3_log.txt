@@ -1,0 +1,392 @@
+R3#ter len 0
+R3#show ip int brie
+Interface                  IP-Address      OK? Method Status                Protocol
+FastEthernet0/0            10.36.1.3       YES NVRAM  up                    up      
+Serial0/0                  unassigned      YES NVRAM  administratively down down    
+FastEthernet0/1            172.16.20.254   YES NVRAM  up                    up      
+Serial0/1                  unassigned      YES NVRAM  administratively down down    
+Serial0/2                  unassigned      YES NVRAM  administratively down down    
+FastEthernet1/0            192.168.20.3    YES NVRAM  up                    up      
+FastEthernet2/0            unassigned      YES NVRAM  administratively down down    
+FastEthernet3/0            unassigned      YES NVRAM  administratively down down    
+FastEthernet4/0            unassigned      YES NVRAM  administratively down down    
+Loopback0                  3.3.3.3         YES NVRAM  up                    up      
+R3#show cdp nei
+Capability Codes: R - Router, T - Trans Bridge, B - Source Route Bridge
+                  S - Switch, H - Host, I - IGMP, r - Repeater
+
+Device ID        Local Intrfce     Holdtme    Capability  Platform  Port ID
+WAN1             Fas 0/0            123        R S I      3745      Fas 0/1
+R3#show run
+Building configuration...
+
+Current configuration : 2219 bytes
+!
+version 12.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R3
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no aaa new-model
+memory-size iomem 5
+no ip icmp rate-limit unreachable
+ip cef
+!
+!
+!
+!
+no ip domain lookup
+ip auth-proxy max-nodata-conns 3
+ip admission max-nodata-conns 3
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+! 
+!
+!
+!
+!
+interface Loopback0
+ ip address 3.3.3.3 255.255.255.255
+!
+interface FastEthernet0/0
+ ip address 10.36.1.3 255.255.255.0
+ ip mtu 1400
+ duplex auto
+ speed auto
+!
+interface Serial0/0
+ no ip address
+ shutdown
+ clock rate 2000000
+!
+interface FastEthernet0/1
+ ip address 172.16.20.254 255.255.255.0
+ duplex auto
+ speed auto
+!
+interface Serial0/1
+ no ip address
+ shutdown
+ clock rate 2000000
+!
+interface Serial0/2
+ no ip address
+ shutdown
+ clock rate 2000000
+!
+interface FastEthernet1/0
+ ip address 192.168.20.3 255.255.255.0
+ duplex auto
+ speed auto
+!
+interface FastEthernet2/0
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+interface FastEthernet3/0
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+interface FastEthernet4/0
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+router ospf 1
+ log-adjacency-changes
+ network 3.3.3.3 0.0.0.0 area 1
+ network 10.36.1.0 0.0.0.255 area 1
+!
+router bgp 65002
+ bgp log-neighbor-changes
+ neighbor 1.1.1.1 remote-as 65001
+ neighbor 1.1.1.1 ebgp-multihop 255
+ neighbor 1.1.1.1 update-source Loopback0
+ neighbor 1.1.1.1 timers 60 240
+ neighbor 10.24.1.1 remote-as 65001
+ neighbor 10.24.1.1 ebgp-multihop 255
+ neighbor 10.24.1.1 update-source FastEthernet0/0
+ neighbor 10.24.1.1 timers 60 240
+ !
+ address-family ipv4
+  neighbor 1.1.1.1 activate
+  neighbor 10.24.1.1 activate
+  no auto-summary
+  no synchronization
+  network 3.3.3.3 mask 255.255.255.255
+  network 10.36.1.0 mask 255.255.255.0
+ exit-address-family
+!
+ip forward-protocol nd
+ip route 1.1.1.1 255.255.255.255 10.36.1.2
+!
+!
+no ip http server
+no ip http secure-server
+!
+no cdp log mismatch duplex
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+line aux 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+line vty 0 4
+ login
+!
+!
+end
+
+R3#show ip route vrf *
+Codes: C - connected, S - static, R - RIP, M - mobile, B - BGP
+       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area 
+       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+       E1 - OSPF external type 1, E2 - OSPF external type 2
+       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
+       ia - IS-IS inter area, * - candidate default, U - per-user static route
+       o - ODR, P - periodic downloaded static route
+
+Gateway of last resort is not set
+
+     1.0.0.0/32 is subnetted, 1 subnets
+S       1.1.1.1 [1/0] via 10.36.1.2
+     2.0.0.0/32 is subnetted, 1 subnets
+O IA    2.2.2.2 [110/11] via 10.36.1.2, 22:35:31, FastEthernet0/0
+     3.0.0.0/32 is subnetted, 1 subnets
+C       3.3.3.3 is directly connected, Loopback0
+     172.16.0.0/24 is subnetted, 1 subnets
+C       172.16.20.0 is directly connected, FastEthernet0/1
+C    192.168.20.0/24 is directly connected, FastEthernet1/0
+     10.0.0.0/24 is subnetted, 2 subnets
+B       10.24.1.0 [20/0] via 1.1.1.1, 22:28:54
+C       10.36.1.0 is directly connected, FastEthernet0/0
+R3#sho ip ospf nei
+
+Neighbor ID     Pri   State           Dead Time   Address         Interface
+2.2.2.2           1   FULL/DR         00:00:39    10.36.1.2       FastEthernet0/0
+R3#show ip ospf data
+
+            OSPF Router with ID (3.3.3.3) (Process ID 1)
+
+		Router Link States (Area 1)
+
+Link ID         ADV Router      Age         Seq#       Checksum Link count
+2.2.2.2         2.2.2.2         846         0x8000002D 0x006E1C 1
+3.3.3.3         3.3.3.3         879         0x8000002C 0x002C3A 2
+
+		Net Link States (Area 1)
+
+Link ID         ADV Router      Age         Seq#       Checksum
+10.36.1.2       2.2.2.2         847         0x8000002C 0x00942D
+
+		Summary Net Link States (Area 1)
+
+Link ID         ADV Router      Age         Seq#       Checksum
+1.1.1.1         2.2.2.2         1614        0x8000002A 0x003BC1
+2.2.2.2         2.2.2.2         1614        0x8000002A 0x00A85A
+10.24.1.0       2.2.2.2         1614        0x8000002A 0x00B02E
+R3#show ip bgp nei
+BGP neighbor is 1.1.1.1,  remote AS 65001, external link
+  BGP version 4, remote router ID 1.1.1.1
+  BGP state = Established, up for 22:29:10
+  Last read 00:00:10, last write 00:00:10, hold time is 240, keepalive interval is 60 seconds
+  Configured hold time is 240,keepalive interval is 60 seconds  Minimum holdtime from neighbor is 0 seconds
+  Neighbor capabilities:
+    Route refresh: advertised and received(old & new)
+    Address family IPv4 Unicast: advertised and received
+  Message statistics:
+    InQ depth is 0
+    OutQ depth is 0
+                         Sent       Rcvd
+    Opens:                  2          2
+    Notifications:          1          0
+    Updates:                9          3
+    Keepalives:          1358       1355
+    Route Refresh:          0          0
+    Total:               1369       1360
+  Default minimum time between advertisement runs is 30 seconds
+
+ For address family: IPv4 Unicast
+  BGP table version 28, neighbor version 28/0
+ Output queue size : 0
+  Index 1, Offset 0, Mask 0x2
+  1 update-group member
+                                 Sent       Rcvd
+  Prefix activity:               ----       ----
+    Prefixes Current:               4          2 (Consumes 104 bytes)
+    Prefixes Total:                 4          2
+    Implicit Withdraw:              2          0
+    Explicit Withdraw:              0          0
+    Used as bestpath:             n/a          2
+    Used as multipath:            n/a          0
+
+                                   Outbound    Inbound
+  Local Policy Denied Prefixes:    --------    -------
+    AS_PATH loop:                       n/a          2
+    Total:                                0          2
+  Number of NLRIs in the update sent: max 2, min 1
+
+  Connections established 2; dropped 1
+  Last reset 22:30:57, due to BGP Notification sent, hold time expired
+  External BGP neighbor may be up to 255 hops away.
+Connection state is ESTAB, I/O status: 1, unread input bytes: 0            
+Connection is ECN Disabled, Mininum incoming TTL 0, Outgoing TTL 255
+Local host: 3.3.3.3, Local port: 179
+Foreign host: 1.1.1.1, Foreign port: 47906
+
+Enqueued packets for retransmit: 0, input: 0  mis-ordered: 0 (0 bytes)
+
+Event Timers (current time is 0x4D96D58):
+Timer          Starts    Wakeups            Next
+Retrans          1353          0             0x0
+TimeWait            0          0             0x0
+AckHold          1352          1             0x0
+SendWnd             0          0             0x0
+KeepAlive           0          0             0x0
+GiveUp              0          0             0x0
+PmtuAger            0          0             0x0
+DeadWait            0          0             0x0
+
+iss: 2605089320  snduna: 2605115163  sndnxt: 2605115163     sndwnd:  15890
+irs: 2708893804  rcvnxt: 2708919647  rcvwnd:      15890  delrcvwnd:    494
+
+SRTT: 300 ms, RTTO: 303 ms, RTV: 3 ms, KRTT: 0 ms
+minRTT: 20 ms, maxRTT: 300 ms, ACK hold: 200 ms
+Flags: passive open, nagle, gen tcbs
+IP Precedence value : 6
+
+Datagrams (max data segment is 536 bytes):
+Rcvd: 2707 (out of order: 0), with data: 1354, total data bytes: 25842
+Sent: 1401 (retransmit: 0, fastretransmit: 0, partialack: 0, Second Congestion: 0), with data: 1353, total data bytes: 25842
+
+BGP neighbor is 10.24.1.1,  remote AS 65001, external link
+  BGP version 4, remote router ID 1.1.1.1
+  BGP state = Established, up for 22:30:25
+  Last read 00:00:27, last write 00:00:27, hold time is 240, keepalive interval is 60 seconds
+  Configured hold time is 240,keepalive interval is 60 seconds  Minimum holdtime from neighbor is 0 seconds
+  Neighbor capabilities:
+    Route refresh: advertised and received(old & new)
+    Address family IPv4 Unicast: advertised and received
+  Message statistics:
+    InQ depth is 0
+    OutQ depth is 0
+                         Sent       Rcvd
+    Opens:                  2          2
+    Notifications:          1          0
+    Updates:                8          5
+    Keepalives:          1359       1356
+    Route Refresh:          0          0
+    Total:               1370       1363
+  Default minimum time between advertisement runs is 30 seconds
+
+ For address family: IPv4 Unicast
+  BGP table version 28, neighbor version 28/0
+ Output queue size : 0
+  Index 1, Offset 0, Mask 0x2
+  1 update-group member
+                                 Sent       Rcvd
+  Prefix activity:               ----       ----
+    Prefixes Current:               4          2 (Consumes 104 bytes)
+    Prefixes Total:                 4          2
+    Implicit Withdraw:              0          0
+    Explicit Withdraw:              0          0
+    Used as bestpath:             n/a          0
+    Used as multipath:            n/a          0
+
+                                   Outbound    Inbound
+  Local Policy Denied Prefixes:    --------    -------
+    AS_PATH loop:                       n/a          5
+    Total:                                0          5
+  Number of NLRIs in the update sent: max 2, min 1
+
+  Connections established 2; dropped 1
+  Last reset 22:31:31, due to BGP Notification sent, hold time expired
+  External BGP neighbor may be up to 255 hops away.
+Connection state is ESTAB, I/O status: 1, unread input bytes: 0            
+Connection is ECN Disabled, Mininum incoming TTL 0, Outgoing TTL 255
+Local host: 10.36.1.3, Local port: 25970
+Foreign host: 10.24.1.1, Foreign port: 179
+
+Enqueued packets for retransmit: 0, input: 0  mis-ordered: 0 (0 bytes)
+
+Event Timers (current time is 0x4D981A4):
+Timer          Starts    Wakeups            Next
+Retrans          1358          5             0x0
+TimeWait            0          0             0x0
+AckHold          1351       1303             0x0
+SendWnd             0          0             0x0
+KeepAlive           0          0             0x0
+GiveUp              0          0             0x0
+PmtuAger            0          0             0x0
+DeadWait            0          0             0x0
+
+iss:  590261112  snduna:  590286974  sndnxt:  590286974     sndwnd:  15871
+irs: 1791509234  rcvnxt: 1791535196  rcvwnd:      16308  delrcvwnd:     76
+
+SRTT: 300 ms, RTTO: 303 ms, RTV: 3 ms, KRTT: 0 ms
+minRTT: 8 ms, maxRTT: 300 ms, ACK hold: 200 ms
+Flags: active open, nagle
+IP Precedence value : 6
+
+Datagrams (max data segment is 536 bytes):
+Rcvd: 1400 (out of order: 1), with data: 1351, total data bytes: 25961
+Sent: 2708 (retransmit: 5, fastretransmit: 0, partialack: 0, Second Congestion: 0), with data: 1355, total data bytes: 25861
+R3#show ip bgp
+BGP table version is 28, local router ID is 3.3.3.3
+Status codes: s suppressed, d damped, h history, * valid, > best, i - internal,
+              r RIB-failure, S Stale
+Origin codes: i - IGP, e - EGP, ? - incomplete
+
+   Network          Next Hop            Metric LocPrf Weight Path
+r  1.1.1.1/32       10.24.1.1                0             0 65001 i
+r>                  1.1.1.1                  0             0 65001 i
+*> 3.3.3.3/32       0.0.0.0                  0         32768 i
+*  10.24.1.0/24     10.24.1.1                0             0 65001 i
+*>                  1.1.1.1                  0             0 65001 i
+*> 10.36.1.0/24     0.0.0.0                  0         32768 i
+R3#
+R3#
+
